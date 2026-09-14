@@ -1,10 +1,12 @@
-import authArt from '@/assets/auth-art.jpg';
-import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
-import { zodResolver } from '@hookform/resolvers/zod';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Link } from 'react-router-dom';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { Link } from 'react-router-dom';
+import { Eye, EyeOff } from 'lucide-react';
+import { Input } from '@/components/ui/Input';
+import { Button } from '@/components/ui/Button';
+import authArt from '@/assets/auth-art.jpg';
 
 const loginSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
@@ -13,6 +15,8 @@ const loginSchema = z.object({
 });
 
 export default function LoginPage() {
+  const [showPassword, setShowPassword] = useState(false);
+
   const {
     register,
     handleSubmit,
@@ -32,8 +36,8 @@ export default function LoginPage() {
 
   return (
     <div className="flex min-h-screen w-full items-center justify-center bg-[#EAEBED] p-4">
-      {/* Container Card */}
       <div className="flex w-full max-w-5xl overflow-hidden rounded-3xl bg-white shadow-2xl transition-all">
+        
         {/* Left Form Section */}
         <div className="flex w-full flex-col justify-center px-8 py-6 sm:px-12 md:w-[52%] lg:px-14">
           <div className="mb-5">
@@ -66,16 +70,30 @@ export default function LoginPage() {
                   forgot password
                 </Link>
               </div>
-              <input
-                type="password"
-                placeholder="Enter your password"
-                className={`w-full rounded-lg border bg-white px-3.5 py-2.5 text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 transition-all ${
-                  errors.password
-                    ? 'border-red-500 focus:ring-red-200'
-                    : 'border-neutral-200 focus:border-neutral-900 focus:ring-neutral-200'
-                }`}
-                {...register('password')}
-              />
+              <div className="relative flex items-center">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="Enter your password"
+                  className={`w-full rounded-lg border bg-white px-3.5 py-2.5 pr-10 text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 transition-all ${
+                    errors.password
+                      ? 'border-red-500 focus:ring-red-200'
+                      : 'border-neutral-200 focus:border-neutral-900 focus:ring-neutral-200'
+                  }`}
+                  {...register('password')}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  className="absolute right-3 text-neutral-400 hover:text-neutral-600 focus:outline-none cursor-pointer"
+                  tabIndex={-1}
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
+                </button>
+              </div>
               {errors.password && (
                 <span className="text-[11px] font-medium text-red-600">
                   {errors.password.message}
@@ -147,10 +165,7 @@ export default function LoginPage() {
               type="button"
               className="py-2.5 px-3 text-xs whitespace-nowrap gap-2 font-medium"
             >
-              <svg
-                className="h-4 w-4 shrink-0 fill-current"
-                viewBox="0 0 24 24"
-              >
+              <svg className="h-4 w-4 shrink-0 fill-current" viewBox="0 0 24 24">
                 <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.37c.62-.75 1.04-1.8 1.01-2.87-.96.04-2.13.64-2.79 1.41-.58.68-1.1 1.75-.97 2.8 1.08.08 2.13-.59 2.75-1.34z" />
               </svg>
               <span>Sign in with Apple</span>
@@ -180,6 +195,7 @@ export default function LoginPage() {
             />
           </div>
         </div>
+
       </div>
     </div>
   );

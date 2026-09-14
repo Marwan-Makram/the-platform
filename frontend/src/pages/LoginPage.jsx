@@ -6,32 +6,28 @@ import { useForm } from 'react-hook-form';
 import { Link } from 'react-router-dom';
 import { z } from 'zod';
 
-const signUpSchema = z.object({
-  name: z.string().min(2, 'Name must be at least 2 characters'),
+const loginSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
-  password: z.string().min(8, 'Password must be at least 8 characters'),
-  terms: z.literal(true, {
-    errorMap: () => ({ message: 'You must agree to the terms & policy' }),
-  }),
+  password: z.string().min(1, 'Password is required'),
+  rememberMe: z.boolean().optional(),
 });
 
-export default function SignUpPage() {
+export default function LoginPage() {
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm({
-    resolver: zodResolver(signUpSchema),
+    resolver: zodResolver(loginSchema),
     defaultValues: {
-      name: '',
       email: '',
       password: '',
-      terms: false,
+      rememberMe: false,
     },
   });
 
   const onSubmit = async (data) => {
-    console.log('Form submission payload:', data);
+    console.log('Login credentials payload:', data);
   };
 
   return (
@@ -40,23 +36,16 @@ export default function SignUpPage() {
       <div className="flex w-full max-w-5xl overflow-hidden rounded-3xl bg-white shadow-2xl transition-all">
         {/* Left Form Section */}
         <div className="flex w-full flex-col justify-center px-8 py-6 sm:px-12 md:w-[52%] lg:px-14">
-          <div className="mb-4">
+          <div className="mb-5">
             <h1 className="text-2xl font-semibold tracking-tight text-neutral-900 sm:text-3xl">
-              Get Started Now
+              Let’s get you back on track
             </h1>
             <p className="mt-1 text-xs font-medium text-neutral-500">
-              New here ? No problem.
+              Enter your Credentials to access your account
             </p>
           </div>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
-            <Input
-              label="Name"
-              placeholder="Enter your name"
-              {...register('name')}
-              error={errors.name}
-            />
-
             <Input
               label="Email address"
               type="email"
@@ -65,41 +54,53 @@ export default function SignUpPage() {
               error={errors.email}
             />
 
-            <Input
-              label="Password"
-              type="password"
-              placeholder="Enter your password"
-              {...register('password')}
-              error={errors.password}
-            />
-
-            {/* Terms and Policy Checkbox */}
-            <div className="flex flex-col gap-1 pt-0.5">
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  {...register('terms')}
-                  className="h-3.5 w-3.5 rounded border-neutral-300 text-neutral-900 focus:ring-neutral-900"
-                />
-                <span className="text-[11px] font-medium text-neutral-700 select-none">
-                  I agree to the{' '}
-                  <a
-                    href="#"
-                    className="underline font-semibold hover:text-black"
-                  >
-                    terms & policy
-                  </a>
-                </span>
-              </label>
-              {errors.terms && (
+            <div className="flex flex-col gap-1.5">
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-semibold text-neutral-800">
+                  Password
+                </label>
+                <Link
+                  to="/forgot-password"
+                  className="text-xs font-semibold text-blue-600 hover:text-blue-700 hover:underline"
+                >
+                  forgot password
+                </Link>
+              </div>
+              <input
+                type="password"
+                placeholder="Enter your password"
+                className={`w-full rounded-lg border bg-white px-3.5 py-2.5 text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 transition-all ${
+                  errors.password
+                    ? 'border-red-500 focus:ring-red-200'
+                    : 'border-neutral-200 focus:border-neutral-900 focus:ring-neutral-200'
+                }`}
+                {...register('password')}
+              />
+              {errors.password && (
                 <span className="text-[11px] font-medium text-red-600">
-                  {errors.terms.message}
+                  {errors.password.message}
                 </span>
               )}
             </div>
 
+            {/* Remember for 30 days */}
+            <div className="flex items-center gap-2 pt-0.5">
+              <input
+                id="rememberMe"
+                type="checkbox"
+                {...register('rememberMe')}
+                className="h-3.5 w-3.5 rounded border-neutral-300 text-neutral-900 focus:ring-neutral-900 cursor-pointer"
+              />
+              <label
+                htmlFor="rememberMe"
+                className="text-[11px] font-medium text-neutral-700 select-none cursor-pointer"
+              >
+                Remember for 30 days
+              </label>
+            </div>
+
             <Button type="submit" loading={isSubmitting} className="mt-1">
-              Sign up
+              Login
             </Button>
           </form>
 
@@ -156,14 +157,14 @@ export default function SignUpPage() {
             </Button>
           </div>
 
-          {/* Switch to Login */}
+          {/* Switch to SignUp */}
           <p className="mt-5 text-center text-xs font-medium text-neutral-600">
-            Have an account?{' '}
+            Don’t have an account?{' '}
             <Link
-              to="/login"
+              to="/signup"
               className="font-semibold text-blue-600 hover:text-blue-700 hover:underline"
             >
-              Sign In
+              Sign Up
             </Link>
           </p>
         </div>

@@ -1,5 +1,6 @@
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import LoginPage from '@/pages/LoginPage';
 import SignUpPage from '@/pages/SignUpPage';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 
 const router = createBrowserRouter([
   {
@@ -12,11 +13,7 @@ const router = createBrowserRouter([
   },
   {
     path: '/login',
-    element: (
-      <div className="flex min-h-screen items-center justify-center bg-[#EAEBED]">
-        <h2 className="text-xl font-bold">Login View (Next step)</h2>
-      </div>
-    ),
+    element: <LoginPage />,
   },
 ]);
 

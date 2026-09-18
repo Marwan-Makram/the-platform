@@ -9,6 +9,7 @@ import SuccessPage from '@/pages/SuccessPage';
 import WelcomeBackPage from '@/pages/WelcomeBackPage';
 import DashboardLayout from '@/layouts/DashboardLayout';
 import OverviewPage from '@/pages/dashboard/OverviewPage';
+import ProfilePage from '@/pages/dashboard/ProfilePage';
 
 const router = createBrowserRouter([
   { path: '/', element: <SignUpPage /> },
@@ -27,6 +28,10 @@ const router = createBrowserRouter([
       {
         index: true,
         element: <OverviewPage />,
+      },
+      {
+        path: 'profile',
+        element: <ProfilePage />,
       },
       {
         path: 'projects',

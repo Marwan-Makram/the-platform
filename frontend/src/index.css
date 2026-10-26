@@ -1,38 +1,152 @@
 @import "tailwindcss";
 
-/* 1. Eliminate native browser scrollbars globally */
-html, body {
-  height: 100%;
-  overflow: hidden;
+:root {
+  /* Select Brand Scale */
+  --navy-50: #EEF1F7;
+  --navy-100: #DDE3EF;
+  --navy-200: #BCC7DE;
+  --navy-300: #93A3C6;
+  --navy-400: #6A7FAA;
+  --navy-500: #455B8A;
+  --navy-600: #30497D;
+  --navy-700: #253C6D;
+  --navy-800: #1A2B52;
+  --navy-900: #121B33;
+
+  --orange-100: #FDE7D5;
+  --orange-300: #F8B27F;
+  --orange-500: #F2842F;
+  --orange-600: #D96A14;
+  --orange-700: #B4500A;
+  --cream: #F6F1E7;
+
+  /* Theme semantic roles */
+  --bg: #F5F6F9;
+  --surface: #FFFFFF;
+  --surface-2: #EDF0F6;
+  --line: #DCE1EB;
+  --ink: #14203D;
+  --ink-2: #4A5673;
+
+  --primary: #253C6D;
+  --primary-hover: #30497D;
+  --on-primary: #FFFFFF;
+  --accent: #F2842F;
+  --accent-hover: #E6761E;
+  --accent-ink: #1A2A52;
+  --accent-text: #B4500A;
+  --focus: #D96A14;
+
+  --ok: #1F7A4D;
+  --ok-bg: #E3F4EA;
+  --warn: #8A5A00;
+  --warn-bg: #FFF1D0;
+  --danger: #B42318;
+  --danger-bg: #FDE8E6;
+  --info: #30497D;
+  --info-bg: #E6ECF8;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --r-1: 4px;
+  --r-2: 8px;
+  --r-3: 14px;
+  --r-pill: 999px;
 }
 
-/* 2. Custom scrollbar matching the Figma design */
+@layer base {
+  body {
+    font-family: 'Poppins', 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background-color: #F5F6F9;
+    color: #14203D;
+  }
+}
+
+.font-poppins {
+  font-family: 'Poppins', sans-serif;
+}
+.font-dmsans {
+  font-family: 'DM Sans', sans-serif;
+}
+.font-inter {
+  font-family: 'Inter', sans-serif;
+}
+.font-outfit {
+  font-family: 'Outfit', sans-serif;
+}
+
+/* Custom scrollbar matching the Figma design */
 .figma-scroll {
   scrollbar-width: thin;
-  scrollbar-color: #E2E2E2 transparent;
+  scrollbar-color: rgba(37, 60, 109, 0.18) transparent;
 }
 
 .figma-scroll::-webkit-scrollbar {
-  width: 4px;
+  width: 6px;
 }
 
 .figma-scroll::-webkit-scrollbar-track {
   background: transparent;
-  margin: 12px 0;
+  margin: 4px 0;
 }
 
 .figma-scroll::-webkit-scrollbar-thumb {
-  background: #D4D4D8;
-  border-radius: 9999px;
+  background: rgba(37, 60, 109, 0.18);
+  border-radius: 1000px;
 }
 
 .figma-scroll::-webkit-scrollbar-thumb:hover {
-  background: #A1A1AA;
+  background: rgba(37, 60, 109, 0.32);
 }
 
-/* Remove default arrows */
+.dark-dashboard .figma-scroll {
+  scrollbar-color: rgba(169, 183, 214, 0.28) transparent;
+}
+
+.dark-dashboard .figma-scroll::-webkit-scrollbar-thumb {
+  background: rgba(169, 183, 214, 0.28);
+}
+
 .figma-scroll::-webkit-scrollbar-button {
   display: none;
   width: 0;
   height: 0;
 }
+
+/* Dark mode support for dashboard subpages using neutral utilities */
+.dark-dashboard .bg-white {
+  background-color: #16213E !important;
+}
+
+.dark-dashboard .bg-neutral-50,
+.dark-dashboard .bg-neutral-50\/50,
+.dark-dashboard .bg-neutral-50\/70,
+.dark-dashboard .bg-neutral-100 {
+  background-color: #1A2B52 !important;
+}
+
+.dark-dashboard .text-neutral-900,
+.dark-dashboard .text-neutral-800,
+.dark-dashboard .text-neutral-700 {
+  color: #F6F4EF !important;
+}
+
+.dark-dashboard .text-neutral-600,
+.dark-dashboard .text-neutral-500,
+.dark-dashboard .text-neutral-400 {
+  color: #A9B7D6 !important;
+}
+
+.dark-dashboard .border-neutral-200,
+.dark-dashboard .border-neutral-200\/90,
+.dark-dashboard .border-neutral-300,
+.dark-dashboard .border-neutral-100,
+.dark-dashboard .divide-neutral-100 > :not([hidden]) ~ :not([hidden]) {
+  border-color: #30497D !important;
+}
+
+

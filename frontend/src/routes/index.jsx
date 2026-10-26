@@ -33,26 +33,6 @@ const router = createBrowserRouter([
         path: 'profile',
         element: <ProfilePage />,
       },
-      {
-        path: 'projects',
-        element: <div className="text-sm font-semibold text-neutral-700">Projects View</div>,
-      },
-      {
-        path: 'insights',
-        element: <div className="text-sm font-semibold text-neutral-700">Insights View</div>,
-      },
-      {
-        path: 'messages',
-        element: <div className="text-sm font-semibold text-neutral-700">Messages View</div>,
-      },
-      {
-        path: 'calendar',
-        element: <div className="text-sm font-semibold text-neutral-700">Calendar View</div>,
-      },
-      {
-        path: 'settings',
-        element: <div className="text-sm font-semibold text-neutral-700">Settings View</div>,
-      },
     ],
   },
 ]);

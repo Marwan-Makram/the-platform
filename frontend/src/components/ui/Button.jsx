@@ -8,12 +8,12 @@ export function Button({
   ...props
 }) {
   const baseStyles =
-    'flex items-center justify-center rounded-lg text-sm font-medium transition-all duration-150 active:scale-[0.99] disabled:opacity-50 disabled:pointer-events-none cursor-pointer';
+    'flex items-center justify-center rounded-[12px] font-inter font-medium text-[14px] leading-[25px] transition-all duration-150 active:scale-[0.99] disabled:opacity-50 disabled:pointer-events-none cursor-pointer';
 
   const variants = {
-    primary: 'bg-black text-white hover:bg-neutral-800 py-3 w-full shadow-sm',
+    primary: 'bg-[#253C6D] hover:bg-[#1d3058] text-white py-2.5 px-4 w-full shadow-sm',
     outline:
-      'border border-neutral-200 bg-white text-neutral-800 hover:bg-neutral-50 py-2.5 px-4 w-full gap-2 text-xs font-semibold shadow-xs',
+      'border border-[#D9D9D9] bg-white text-black hover:bg-neutral-50 py-2 px-4 w-full gap-2 text-xs font-poppins font-medium shadow-xs',
   };
 
   return (

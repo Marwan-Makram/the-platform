@@ -9,7 +9,7 @@ export const Input = forwardRef(
     return (
       <div className="flex w-full flex-col gap-1.5">
         {label && (
-          <label className="text-xs font-semibold text-neutral-800">
+          <label className="font-poppins font-medium text-[14px] leading-[21px] text-[#16213E]">
             {label}
           </label>
         )}
@@ -17,12 +17,12 @@ export const Input = forwardRef(
           <input
             ref={ref}
             type={isPassword ? (showPassword ? 'text' : 'password') : type}
-            className={`w-full rounded-lg border bg-white px-3.5 py-2.5 text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 transition-all ${
-              isPassword ? 'pr-10' : ''
+            className={`w-full h-[32px] rounded-[10px] border bg-white px-[10px] font-poppins font-medium text-[12px] placeholder:text-[#455B8A] placeholder:text-[10px] text-[#16213E] focus:outline-none transition-all ${
+              isPassword ? 'pr-9' : ''
             } ${
               error
-                ? 'border-red-500 focus:ring-red-200'
-                : 'border-neutral-200 focus:border-neutral-900 focus:ring-neutral-200'
+                ? 'border-red-500 ring-1 ring-red-200'
+                : 'border-[#A9B7D6] focus:border-[#253C6D]'
             }`}
             {...props}
           />

@@ -1,7 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Briefcase, X, Calendar, Plus, Paperclip } from 'lucide-react';
+import { X, Plus, Paperclip } from 'lucide-react';
+import FigmaCalendarPicker from '@/components/profile/FigmaCalendarPicker';
 
-export default function AddProjectModal({ isOpen, onClose, onSave, initialData }) {
+const MAX_DESCRIPTION_LENGTH = 300;
+
+export default function AddProjectModal({
+  isOpen,
+  onClose,
+  onSave,
+  initialData,
+  darkMode = false,
+}) {
   const [project, setProject] = useState('');
   const [company, setCompany] = useState('');
   const [date, setDate] = useState('2024');
@@ -16,12 +25,12 @@ export default function AddProjectModal({ isOpen, onClose, onSave, initialData }
       setCompany(initialData.company || '');
       setDate(initialData.year || '2024');
       setLinks(initialData.links || '');
-      setDescription(initialData.desc || '');
+      setDescription((initialData.desc || '').slice(0, MAX_DESCRIPTION_LENGTH));
       setAttachment(initialData.attachment || null);
     } else {
       setProject('');
       setCompany('');
-      setDate(new Date().getFullYear().toString());
+      setDate('2024');
       setLinks('');
       setDescription('');
       setAttachment(null);
@@ -35,9 +44,13 @@ export default function AddProjectModal({ isOpen, onClose, onSave, initialData }
     if (file) {
       setAttachment({
         name: file.name,
-        size: `${(file.size / (1024 * 1024)).toFixed(1)} MB`,
+        size: `${Math.max(0.1, file.size / (1024 * 1024)).toFixed(1)} MB`,
       });
     }
+  };
+
+  const handleDescriptionChange = (e) => {
+    setDescription(e.target.value.slice(0, MAX_DESCRIPTION_LENGTH));
   };
 
   const handleSubmit = (e) => {
@@ -46,10 +59,10 @@ export default function AddProjectModal({ isOpen, onClose, onSave, initialData }
 
     onSave({
       id: initialData ? initialData.id : Date.now(),
-      title: project,
-      company,
-      year: date,
-      desc: description,
+      title: project.trim(),
+      company: company.trim() || 'THE SOCIETY',
+      year: date.trim() || '2024',
+      desc: description.trim().slice(0, MAX_DESCRIPTION_LENGTH),
       links: links.trim(),
       attachment,
     });
@@ -57,149 +70,251 @@ export default function AddProjectModal({ isOpen, onClose, onSave, initialData }
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-xs">
-      <div className="relative w-full max-w-[500px] rounded-[24px] bg-white p-7 shadow-2xl">
-        <div className="flex items-start justify-between">
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-neutral-200 bg-white shadow-2xs">
-            <Briefcase className="h-5 w-5 text-neutral-800 stroke-[1.8]" />
-          </div>
+    <div
+      onClick={onClose}
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/45 p-4 backdrop-blur-xs"
+    >
+      {/* Add-Portfolio Modal Card (520px) */}
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className={`relative flex max-h-[90vh] w-full max-w-[520px] flex-col overflow-hidden rounded-[16px] border shadow-[0_12px_40px_rgba(0,0,0,0.102)] transition-colors ${
+          darkMode
+            ? 'border-[#30497D] bg-[#16213E] text-[#F6F4EF]'
+            : 'border-[#A9B7D6] bg-[#FFFFFF] text-[#16213E]'
+        }`}
+      >
+        {/* Header */}
+        <div className="flex min-h-[72px] sm:h-[81px] w-full shrink-0 items-center justify-between px-[18px] sm:px-[24px] pt-[20px] sm:pt-[24px] pb-[16px] sm:pb-[20px]">
+          <h2
+            className={`font-inter text-[20px] sm:text-[24px] font-bold leading-[30px] sm:leading-[37px] ${
+              darkMode ? 'text-[#F6F4EF]' : 'text-[#16213E]'
+            }`}
+          >
+            {initialData ? 'Edit Project' : 'Add Projects to Portfolio'}
+          </h2>
           <button
             type="button"
             onClick={onClose}
-            className="text-neutral-400 hover:text-neutral-900 cursor-pointer"
+            aria-label="Close modal"
+            className={`flex h-[32px] w-[32px] items-center justify-center rounded-[8px] transition-colors cursor-pointer ${
+              darkMode
+                ? 'text-[#A9B7D6] hover:bg-[#1A2B52] hover:text-[#FFFFFF]'
+                : 'text-[#455B8A] hover:bg-[#F6F4EF] hover:text-[#16213E]'
+            }`}
           >
-            <X className="h-5 w-5" />
+            <X className="h-[20px] w-[20px] stroke-[1.8]" />
           </button>
         </div>
 
-        <h2 className="mt-5 text-2xl font-bold tracking-tight text-neutral-900">
-          {initialData ? 'Edit Project' : 'Add Projects to Portfolio'}
-        </h2>
-
-        <form onSubmit={handleSubmit} className="mt-6 space-y-4">
-          <div>
-            <label className="text-xs font-bold text-neutral-900">Project *</label>
-            <input
-              type="text"
-              required
-              value={project}
-              onChange={(e) => setProject(e.target.value)}
-              placeholder="What's the project?"
-              className="mt-1.5 h-11 w-full rounded-xl border border-neutral-200 bg-white px-3.5 text-xs text-neutral-800 placeholder:text-neutral-400 focus:border-neutral-900 focus:outline-none"
-            />
-          </div>
-
-          <div>
-            <label className="text-xs font-bold text-neutral-900">Company *</label>
-            <input
-              type="text"
-              required
-              value={company}
-              onChange={(e) => setCompany(e.target.value)}
-              placeholder="Add your company"
-              className="mt-1.5 h-11 w-full rounded-xl border border-neutral-200 bg-white px-3.5 text-xs text-neutral-800 placeholder:text-neutral-400 focus:border-neutral-900 focus:outline-none"
-            />
-          </div>
-
-          <div>
-            <label className="text-xs font-bold text-neutral-900">Year *</label>
-            <div className="relative mt-1.5 flex items-center">
-              <Calendar className="absolute left-3.5 h-4 w-4 text-neutral-400 pointer-events-none" />
+        {/* Form Body */}
+        <form onSubmit={handleSubmit} className="flex flex-col min-h-0 flex-1">
+          <div className="figma-scroll flex flex-col gap-[20px] sm:gap-[24px] overflow-y-auto px-[18px] sm:px-[24px] pb-[24px]">
+            {/* Field 1: Project */}
+            <div className="flex flex-col gap-[8px]">
+              <label
+                className={`font-poppins text-[13px] font-semibold leading-[20px] ${
+                  darkMode ? 'text-[#F6F4EF]' : 'text-[#16213E]'
+                }`}
+              >
+                Project *
+              </label>
               <input
-                type="number"
-                min="1990"
-                max="2099"
+                type="text"
                 required
-                value={date}
-                onChange={(e) => setDate(e.target.value)}
-                className="h-11 w-full rounded-xl border border-neutral-200 bg-white pl-10 pr-9 text-xs font-semibold text-neutral-800 focus:border-neutral-900 focus:outline-none"
+                value={project}
+                onChange={(e) => setProject(e.target.value)}
+                placeholder="What's the project?"
+                className={`h-[44px] w-full rounded-[8px] border px-[14px] font-inter text-[14px] font-medium leading-[25px] focus:outline-none transition-colors ${
+                  darkMode
+                    ? 'border-[#30497D] bg-[#121B33] text-[#F6F4EF] placeholder:text-[#A9B7D6] focus:border-[#F2842F]'
+                    : 'border-[#A9B7D6] bg-[#FFFFFF] text-[#16213E] placeholder:text-[#455B8A] focus:border-[#253C6D]'
+                }`}
               />
-              {date && (
-                <button
-                  type="button"
-                  onClick={() => setDate('')}
-                  className="absolute right-3.5 text-neutral-400 hover:text-neutral-700 cursor-pointer"
+            </div>
+
+            {/* Field 2: Company or Client */}
+            <div className="flex flex-col gap-[8px]">
+              <label
+                className={`font-poppins text-[13px] font-semibold leading-[20px] ${
+                  darkMode ? 'text-[#F6F4EF]' : 'text-[#16213E]'
+                }`}
+              >
+                Company or Client
+              </label>
+              <input
+                type="text"
+                value={company}
+                onChange={(e) => setCompany(e.target.value)}
+                placeholder="Add your company"
+                className={`h-[44px] w-full rounded-[8px] border px-[14px] font-inter text-[14px] font-medium leading-[25px] focus:outline-none transition-colors ${
+                  darkMode
+                    ? 'border-[#30497D] bg-[#121B33] text-[#F6F4EF] placeholder:text-[#A9B7D6] focus:border-[#F2842F]'
+                    : 'border-[#A9B7D6] bg-[#FFFFFF] text-[#16213E] placeholder:text-[#455B8A] focus:border-[#253C6D]'
+                }`}
+              />
+            </div>
+
+            {/* Field 3: Interactive Calendar Date Picker */}
+            <div className="flex flex-col gap-[8px]">
+              <label
+                className={`font-poppins text-[13px] font-semibold leading-[20px] ${
+                  darkMode ? 'text-[#F6F4EF]' : 'text-[#16213E]'
+                }`}
+              >
+                Date
+              </label>
+              <FigmaCalendarPicker
+                value={date}
+                onChange={setDate}
+                mode="project"
+                darkMode={darkMode}
+                placeholder="Select date or year"
+              />
+            </div>
+
+            {/* Field 4: Links (Optional) */}
+            <div className="flex flex-col gap-[8px]">
+              <div className="flex items-baseline gap-[6px]">
+                <label
+                  className={`font-poppins text-[13px] font-semibold leading-[20px] ${
+                    darkMode ? 'text-[#F6F4EF]' : 'text-[#16213E]'
+                  }`}
                 >
-                  <X className="h-3.5 w-3.5" />
-                </button>
-              )}
+                  Links
+                </label>
+                <span
+                  className={`font-poppins text-[12px] font-normal leading-[18px] ${
+                    darkMode ? 'text-[#A9B7D6]' : 'text-[#455B8A]'
+                  }`}
+                >
+                  (Optional)
+                </span>
+              </div>
+              <input
+                type="url"
+                value={links}
+                onChange={(e) => setLinks(e.target.value)}
+                placeholder="Link your Github, Behance... etc"
+                className={`h-[44px] w-full rounded-[8px] border px-[14px] font-inter text-[14px] font-medium leading-[25px] focus:outline-none transition-colors ${
+                  darkMode
+                    ? 'border-[#30497D] bg-[#121B33] text-[#F6F4EF] placeholder:text-[#A9B7D6] focus:border-[#F2842F]'
+                    : 'border-[#A9B7D6] bg-[#FFFFFF] text-[#16213E] placeholder:text-[#455B8A] focus:border-[#253C6D]'
+                }`}
+              />
             </div>
-          </div>
 
-          {/* Optional Links field */}
-          <div>
-            <div className="flex items-center justify-between">
-              <label className="text-xs font-bold text-neutral-900">Links</label>
-              <span className="text-[10px] text-neutral-400 font-medium">Optional</span>
+            {/* Field 5: Description (Optional, max 300 chars) */}
+            <div className="flex flex-col gap-[8px]">
+              <div className="flex items-baseline justify-between gap-[6px]">
+                <div className="flex items-baseline gap-[6px]">
+                  <label
+                    className={`font-poppins text-[13px] font-semibold leading-[20px] ${
+                      darkMode ? 'text-[#F6F4EF]' : 'text-[#16213E]'
+                    }`}
+                  >
+                    Description
+                  </label>
+                  <span
+                    className={`font-poppins text-[12px] font-normal leading-[18px] ${
+                      darkMode ? 'text-[#A9B7D6]' : 'text-[#455B8A]'
+                    }`}
+                  >
+                    (Optional)
+                  </span>
+                </div>
+                <span
+                  className={`font-poppins text-[11px] font-medium ${
+                    description.length >= MAX_DESCRIPTION_LENGTH
+                      ? 'text-[#F2842F]'
+                      : darkMode
+                      ? 'text-[#A9B7D6]'
+                      : 'text-[#455B8A]'
+                  }`}
+                >
+                  {description.length}/{MAX_DESCRIPTION_LENGTH}
+                </span>
+              </div>
+              <textarea
+                rows={3}
+                maxLength={MAX_DESCRIPTION_LENGTH}
+                value={description}
+                onChange={handleDescriptionChange}
+                placeholder="A clean dashboard concept optimized for productivity."
+                className={`h-[80px] w-full resize-none rounded-[8px] border p-[14px] font-inter text-[14px] font-medium leading-[22px] break-words [overflow-wrap:anywhere] focus:outline-none transition-colors ${
+                  darkMode
+                    ? 'border-[#30497D] bg-[#121B33] text-[#F6F4EF] placeholder:text-[#A9B7D6] focus:border-[#F2842F]'
+                    : 'border-[#A9B7D6] bg-[#FFFFFF] text-[#16213E] placeholder:text-[#455B8A] focus:border-[#253C6D]'
+                }`}
+              />
             </div>
-            <input
-              type="url"
-              value={links}
-              onChange={(e) => setLinks(e.target.value)}
-              placeholder="Link your Github, Behance... etc"
-              className="mt-1.5 h-11 w-full rounded-xl border border-neutral-200 bg-white px-3.5 text-xs text-neutral-800 placeholder:text-neutral-400 focus:border-neutral-900 focus:outline-none"
-            />
-          </div>
 
-          <div>
-            <label className="text-xs font-bold text-neutral-900">Description *</label>
-            <textarea
-              rows={3}
-              required
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="e.g. I joined Stripe's Customer Success team to help them scale their checkout product..."
-              className="mt-1.5 w-full rounded-xl border border-neutral-200 bg-white p-3 text-xs leading-relaxed text-neutral-800 placeholder:text-neutral-400 focus:border-neutral-900 focus:outline-none"
-            />
-          </div>
-
-          {/* Optional Attachment File Picker */}
-          <div>
-            <input
-              type="file"
-              ref={fileInputRef}
-              onChange={handleFileChange}
-              className="hidden"
-            />
-            <div className="flex items-center gap-3 py-1">
+            {/* Field 6: Upload Attachment (Frame 1000004191) */}
+            <div className="flex h-[48px] items-center gap-[12px]">
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileChange}
+                className="hidden"
+              />
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="flex h-11 w-11 items-center justify-center rounded-xl border border-dashed border-neutral-300 text-neutral-500 hover:border-neutral-900 hover:text-neutral-900 cursor-pointer transition-colors"
+                className={`flex h-[48px] w-[48px] shrink-0 items-center justify-center rounded-[9px] border border-dashed transition-colors cursor-pointer ${
+                  darkMode
+                    ? 'border-[#30497D] text-[#A9B7D6] hover:border-[#F2842F] hover:text-[#FFFFFF]'
+                    : 'border-[#A9B7D6] text-[#30497D] hover:border-[#253C6D] hover:bg-[#F6F4EF]'
+                }`}
               >
-                <Plus className="h-4 w-4" />
+                <Plus className="h-[20px] w-[20px] stroke-[1.8]" />
               </button>
+
               {attachment ? (
-                <div className="flex items-center gap-2 rounded-lg bg-neutral-100 px-2.5 py-1.5 text-xs font-medium text-neutral-800">
-                  <Paperclip className="h-3.5 w-3.5 text-neutral-500" />
-                  <span className="max-w-[150px] truncate">{attachment.name}</span>
+                <div className="flex items-center gap-2 rounded-[8px] bg-[#E4E9F3] px-3 py-1.5 text-[13px] font-medium text-[#16213E] min-w-0">
+                  <Paperclip className="h-3.5 w-3.5 shrink-0 text-[#253C6D]" />
+                  <span className="max-w-[220px] truncate">{attachment.name}</span>
                   <button
                     type="button"
                     onClick={() => setAttachment(null)}
-                    className="ml-1 text-neutral-400 hover:text-neutral-700"
+                    className="ml-1 shrink-0 text-[#455B8A] hover:text-[#16213E] cursor-pointer"
                   >
-                    <X className="h-3 w-3" />
+                    <X className="h-3.5 w-3.5" />
                   </button>
                 </div>
               ) : (
-                <span className="text-xs font-medium text-neutral-400">
-                  Add Attachment (Optional)
+                <span
+                  onClick={() => fileInputRef.current?.click()}
+                  className={`font-inter text-[14px] font-medium leading-[25px] cursor-pointer ${
+                    darkMode ? 'text-[#A9B7D6]' : 'text-[#455B8A]'
+                  }`}
+                >
+                  Upload Attachment
                 </span>
               )}
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-3 pt-2">
+          {/* Actions Footer */}
+          <div
+            className={`flex h-[78px] w-full shrink-0 items-center justify-end gap-[12px] border-t px-[18px] sm:px-[24px] py-[18px] ${
+              darkMode
+                ? 'border-[#30497D] bg-[#121B33]'
+                : 'border-[#A9B7D6] bg-[#F9F8F7]'
+            }`}
+          >
             <button
               type="button"
               onClick={onClose}
-              className="h-11 rounded-xl border border-neutral-200 text-xs font-bold text-neutral-800 hover:bg-neutral-50 cursor-pointer"
+              className={`flex h-[42px] items-center justify-center rounded-[8px] border px-[18px] font-poppins text-[13px] font-semibold leading-[20px] transition-colors cursor-pointer ${
+                darkMode
+                  ? 'border-[#30497D] bg-[#16213E] text-[#F6F4EF] hover:bg-[#1A2B52]'
+                  : 'border-[#A9B7D6] bg-[#FFFFFF] text-[#16213E] hover:bg-[#F6F4EF]'
+              }`}
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="h-11 rounded-xl bg-black text-xs font-bold text-white hover:bg-neutral-800 cursor-pointer"
+              className="flex h-[42px] items-center justify-center rounded-[8px] bg-[#253C6D] px-[20px] font-poppins text-[13px] font-semibold leading-[20px] text-[#FFFFFF] hover:bg-[#30497D] transition-colors cursor-pointer"
             >
               Confirm
             </button>

@@ -1,39 +1,41 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { useAuth } from '@/context/AuthContext';
+import { useNavigate, useOutletContext } from 'react-router-dom';
 
-const STATS = [
+const KPI_CARDS = [
   {
-    title: 'TOTAL PROJECTS',
-    value: '24',
-    subtitle: '3 completed this week',
-    subtitleColor: 'text-neutral-500',
+    title: 'ACTIVE PROJECTS',
+    value: '3',
+    subtitle: '1 active this week',
+    isUrgent: false,
   },
   {
     title: 'ACTIVE TASKS',
     value: '10',
     subtitle: '5 urgent priorities',
-    subtitleColor: 'text-[#E0533C]',
+    isUrgent: true,
   },
   {
     title: 'COMPLETED TASKS',
     value: '106',
     subtitle: '+24 from last sprint',
-    subtitleColor: 'text-neutral-500',
+    isUrgent: false,
   },
   {
     title: 'TEAM MEMBERS',
     value: '8',
     subtitle: '2 currently active',
-    subtitleColor: 'text-neutral-500',
+    isUrgent: false,
   },
 ];
 
-const TASKS = [
+const RECENT_TASKS = [
   {
     id: 1,
     title: 'Brand Guideline Redesign',
     desc: 'Approved logo assets packaging',
     status: 'Completed',
-    statusColor: 'bg-[#EBF7EE] text-[#227D3B]',
+    statusBg: 'bg-[#EAF3DD]',
     time: 'Today, 2:14 PM',
   },
   {
@@ -41,7 +43,7 @@ const TASKS = [
     title: 'Concept Society Website',
     desc: 'Configuring domain & DNS records',
     status: 'In Progress',
-    statusColor: 'bg-[#F1F1F8] text-[#4F4B7E]',
+    statusBg: 'bg-[#E4E9F3]',
     time: 'Today, 11:30 AM',
   },
   {
@@ -49,7 +51,7 @@ const TASKS = [
     title: 'Client Portal Blueprint',
     desc: 'Wireframing user validation screens',
     status: 'Completed',
-    statusColor: 'bg-[#EBF7EE] text-[#227D3B]',
+    statusBg: 'bg-[#EAF3DD]',
     time: 'Yesterday',
   },
   {
@@ -57,143 +59,360 @@ const TASKS = [
     title: 'SaaS App Development',
     desc: 'Drafting environment variables list',
     status: 'In Progress',
-    statusColor: 'bg-[#F1F1F8] text-[#4F4B7E]',
+    statusBg: 'bg-[#E4E9F3]',
     time: '2 days ago',
   },
 ];
 
 export default function OverviewPage() {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const outletContext = useOutletContext() || {};
+  const { searchQuery = '', darkMode = false } = outletContext;
+
+  const [bannerDecision, setBannerDecision] = useState(null); // null | 'accepted' | 'declined'
+
+  const firstName = user?.name ? user.name.split(' ')[0] : 'Alex';
+
+  const filteredTasks = RECENT_TASKS.filter((task) => {
+    if (!searchQuery.trim()) return true;
+    const q = searchQuery.toLowerCase();
+    return (
+      task.title.toLowerCase().includes(q) ||
+      task.desc.toLowerCase().includes(q) ||
+      task.status.toLowerCase().includes(q)
+    );
+  });
+
   return (
-    <div className="space-y-6">
-      {/* Welcome Title */}
-      <div>
-        <h1 className="text-[26px] font-bold tracking-tight text-neutral-900">
-          Welcome back, Alex
+    <div className="flex w-full flex-col gap-[32px] font-poppins">
+      {/* Greeting */}
+      <div
+        className={`flex w-full flex-col items-start gap-[6px] border-b pb-[16px] ${
+          darkMode ? 'border-[#30497D]' : 'border-[#A9B7D6]'
+        }`}
+      >
+        <h1
+          className={`font-poppins text-[24px] sm:text-[28px] font-bold leading-[36px] sm:leading-[42px] ${
+            darkMode ? 'text-[#F6F4EF]' : 'text-[#253C6D]'
+          }`}
+        >
+          Welcome back, {firstName}
         </h1>
-        <p className="mt-1 text-xs font-normal text-neutral-500">
-          Here is the update on your workspace and active sprints today.
+        <p
+          className={`font-poppins text-[14px] font-normal leading-[21px] ${
+            darkMode ? 'text-[#A9B7D6]' : 'text-[#455B8A]'
+          }`}
+        >
+          Your active projects, upcoming deadlines and latest updates, all in one place.
         </p>
       </div>
 
-      {/* 4 Metric Top Cards */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {STATS.map((stat) => (
-          <div
-            key={stat.title}
-            className="flex flex-col justify-between rounded-[20px] border border-neutral-700 bg-white p-6 min-h-[145px] shadow-[0_5px_15px_rgba(0,0,0,0.06)]"
-          >
-            <span className="text-[10px] font-bold tracking-wider text-neutral-500 uppercase">
-              {stat.title}
+      {/* notification-row (Action Required Banner) */}
+      <div
+        className={`flex w-full flex-col sm:flex-row sm:items-center justify-between gap-[12px] min-h-[92px] rounded-[16px] border px-[24px] py-[12px] ${
+          darkMode
+            ? 'border-[#30497D] bg-[#1A2B52]'
+            : 'border-[#A9B7D6] bg-[#253C6D]'
+        }`}
+      >
+        {/* meta */}
+        <div className="flex flex-1 flex-col items-start gap-[10px]">
+          {/* meta-top */}
+          <div className="flex flex-row items-center gap-[8px] flex-wrap">
+            <span className="flex h-[20px] items-center justify-center rounded-full bg-[#E4E9F3] px-[10px] py-[6px] font-poppins text-[12px] font-semibold leading-[18px] text-[#F2842F]">
+              Action Required
             </span>
-            <div className="my-1.5">
-              <span className="text-3xl font-extrabold tracking-tight text-neutral-900">
-                {stat.value}
+            <span className="font-poppins text-[14px] font-semibold leading-[21px] text-[#FFFFFF]">
+              Karim E.
+            </span>
+          </div>
+
+          <p className="font-poppins text-[13px] font-medium leading-[18px] text-[#FFFFFF]">
+            Assigned to Concept Society redesign. Review scope, milestones, and kickoff checklist.
+          </p>
+        </div>
+
+        {/* actions */}
+        <div className="flex flex-row sm:flex-col items-center sm:items-end justify-end gap-[8px] shrink-0">
+          {bannerDecision === 'accepted' ? (
+            <div className="flex items-center gap-2">
+              <span className="flex h-[30px] items-center justify-center rounded-full bg-[#EAF3DD] px-[12px] py-[6px] font-poppins text-[12px] font-semibold leading-[18px] text-[#16213E]">
+                Accepted
+              </span>
+              <button
+                type="button"
+                onClick={() => setBannerDecision(null)}
+                className="text-[11px] font-medium text-[#E4E9F3] underline hover:text-white cursor-pointer"
+              >
+                Undo
+              </button>
+            </div>
+          ) : bannerDecision === 'declined' ? (
+            <div className="flex items-center gap-2">
+              <span className="flex h-[30px] items-center justify-center rounded-full bg-[#455B8A] px-[12px] py-[6px] font-poppins text-[12px] font-semibold leading-[18px] text-[#F6F4EF]">
+                Declined
+              </span>
+              <button
+                type="button"
+                onClick={() => setBannerDecision(null)}
+                className="text-[11px] font-medium text-[#E4E9F3] underline hover:text-white cursor-pointer"
+              >
+                Undo
+              </button>
+            </div>
+          ) : (
+            <>
+              <button
+                type="button"
+                onClick={() => setBannerDecision('accepted')}
+                className="flex h-[30px] w-[64px] items-center justify-center rounded-full bg-[#FAFAFA] px-[10px] py-[6px] font-poppins text-[12px] font-semibold leading-[18px] text-[#16213E] hover:bg-white transition-colors cursor-pointer"
+              >
+                Accept
+              </button>
+              <button
+                type="button"
+                onClick={() => setBannerDecision('declined')}
+                className="flex h-[30px] w-[66px] items-center justify-center rounded-full bg-[#455B8A] px-[10px] py-[6px] font-poppins text-[12px] font-semibold leading-[18px] text-[#F6F4EF] hover:bg-[#384b73] transition-colors cursor-pointer"
+              >
+                Decline
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+
+      {/* KPI-Grid */}
+      <div className="grid grid-cols-1 gap-[16px] sm:grid-cols-2 lg:grid-cols-4 drop-shadow-[0_4px_4px_rgba(0,0,0,0.25)]">
+        {KPI_CARDS.map((card) => (
+          <div
+            key={card.title}
+            className={`flex h-[165px] flex-col items-start justify-between rounded-[16px] border p-[24px] transition-colors ${
+              darkMode
+                ? 'border-[#30497D] bg-[#16213E]'
+                : 'border-[#A9B7D6] bg-[#FFFFFF]'
+            }`}
+          >
+            <span
+              className={`font-poppins text-[13px] font-medium leading-[20px] tracking-[0.05em] uppercase ${
+                darkMode ? 'text-[#A9B7D6]' : 'text-[#455B8A]'
+              }`}
+            >
+              {card.title}
+            </span>
+
+            <div className="flex w-full flex-row items-baseline gap-[8px]">
+              <span
+                className={`font-poppins text-[32px] font-bold leading-[48px] ${
+                  darkMode ? 'text-[#FFFFFF]' : 'text-[#253C6D]'
+                }`}
+              >
+                {card.value}
               </span>
             </div>
-            <span className={`text-[11px] font-medium ${stat.subtitleColor}`}>
-              {stat.subtitle}
+
+            <span
+              className={`font-poppins text-[11px] leading-[16px] ${
+                card.isUrgent
+                  ? 'font-semibold text-[#FF385C]'
+                  : darkMode
+                  ? 'font-normal text-[#A9B7D6]'
+                  : 'font-normal text-[#455B8A]'
+              }`}
+            >
+              {card.subtitle}
             </span>
           </div>
         ))}
       </div>
 
-      {/* Lower Section Grid */}
-      <div className="grid grid-cols-1 gap-5 lg:grid-cols-12 items-start">
-        {/* Ongoing Project Gauge Card */}
-        <div className="lg:col-span-4 rounded-[20px] border border-neutral-700 bg-white p-6 flex flex-col justify-between min-h-[380px] shadow-[0_5px_15px_rgba(0,0,0,0.06)]">
-          <h3 className="text-sm font-bold text-neutral-900">
+      {/* Middle-Layout */}
+      <div className="flex w-full flex-col lg:flex-row items-start gap-[24px] drop-shadow-[0_4px_4px_rgba(0,0,0,0.25)]">
+        {/* Sprint-Progress-Card */}
+        <div
+          className={`flex h-[296px] w-full lg:w-[380px] shrink-0 flex-col items-start justify-between rounded-[16px] border p-[24px] transition-colors ${
+            darkMode
+              ? 'border-[#30497D] bg-[#16213E]'
+              : 'border-[#A9B7D6] bg-[#FFFFFF]'
+          }`}
+        >
+          <h2
+            className={`font-poppins text-[16px] font-bold leading-[24px] ${
+              darkMode ? 'text-[#F6F4EF]' : 'text-[#16213E]'
+            }`}
+          >
             Ongoing Project
-          </h3>
+          </h2>
 
-          {/* SVG Donut Chart */}
-          <div className="relative flex items-center justify-center my-6">
-            <svg className="h-44 w-44 -rotate-90 transform" viewBox="0 0 100 100">
-              <circle
-                cx="50"
-                cy="50"
-                r="38"
-                fill="transparent"
-                stroke="#EFEFEF"
-                strokeWidth="10"
-              />
-              <circle
-                cx="50"
-                cy="50"
-                r="38"
-                fill="transparent"
-                stroke="#4F46E5"
-                strokeWidth="10"
-                strokeDasharray="238.76"
-                strokeDashoffset="59.69"
-                strokeLinecap="round"
-              />
-            </svg>
-            <div className="absolute flex flex-col items-center justify-center text-center">
-              <span className="text-2xl font-extrabold tracking-tight text-neutral-900">
-                75%
-              </span>
-              <span className="text-[9px] font-bold tracking-widest text-neutral-400 uppercase">
-                DONE
-              </span>
+          {/* Visual-Ring-Block */}
+          <div className="flex h-[140px] w-full flex-col items-center justify-center py-[10px]">
+            <div className="relative flex h-[120px] w-[120px] items-center justify-center">
+              <svg className="h-[120px] w-[120px] -rotate-90 transform" viewBox="0 0 120 120">
+                {/* ring-track */}
+                <circle
+                  cx="60"
+                  cy="60"
+                  r="48"
+                  fill="transparent"
+                  stroke={darkMode ? '#253C6D' : '#E4E9F3'}
+                  strokeWidth="12"
+                />
+                {/* ring-progress */}
+                <circle
+                  cx="60"
+                  cy="60"
+                  r="48"
+                  fill="transparent"
+                  stroke="#F2842F"
+                  strokeWidth="12"
+                  strokeDasharray="301.59"
+                  strokeDashoffset="75.4"
+                  strokeLinecap="round"
+                />
+              </svg>
+
+              {/* center-labels */}
+              <div className="absolute flex flex-col items-center justify-center gap-[2px]">
+                <span
+                  className={`font-poppins text-[22px] font-bold leading-[33px] ${
+                    darkMode ? 'text-[#FFFFFF]' : 'text-[#253C6D]'
+                  }`}
+                >
+                  75%
+                </span>
+                <span
+                  className={`font-poppins text-[10px] font-normal leading-[15px] uppercase ${
+                    darkMode ? 'text-[#A9B7D6]' : 'text-[#455B8A]'
+                  }`}
+                >
+                  done
+                </span>
+              </div>
             </div>
           </div>
 
-          {/* Legend Items */}
-          <div className="space-y-2.5 pt-2">
-            <div className="flex items-center justify-between text-xs">
-              <div className="flex items-center gap-2">
-                <span className="h-2 w-2 rounded-full bg-[#4F46E5]" />
-                <span className="font-semibold text-neutral-800">Done tasks</span>
+          {/* Progress-Breakdown */}
+          <div className="flex w-full flex-col items-start gap-[12px]">
+            <div className="flex h-[20px] w-full flex-row items-center justify-between">
+              <div className="flex flex-row items-center gap-[8px]">
+                <span
+                  className={`h-[8px] w-[8px] rounded-full ${
+                    darkMode ? 'bg-[#F2842F]' : 'bg-[#30497D]'
+                  }`}
+                />
+                <span
+                  className={`font-poppins text-[13px] font-normal leading-[20px] ${
+                    darkMode ? 'text-[#E4E9F3]' : 'text-[#16213E]'
+                  }`}
+                >
+                  Done tasks
+                </span>
               </div>
-              <span className="font-bold text-neutral-900">20</span>
+              <span
+                className={`font-poppins text-[13px] font-semibold leading-[20px] ${
+                  darkMode ? 'text-[#FFFFFF]' : 'text-[#16213E]'
+                }`}
+              >
+                20
+              </span>
             </div>
-            <div className="flex items-center justify-between text-xs">
-              <div className="flex items-center gap-2">
-                <span className="h-2 w-2 rounded-full bg-[#E5E7EB]" />
-                <span className="font-semibold text-neutral-800">In progress</span>
+
+            <div className="flex h-[20px] w-full flex-row items-center justify-between">
+              <div className="flex flex-row items-center gap-[8px]">
+                <span
+                  className={`h-[8px] w-[8px] rounded-full ${
+                    darkMode ? 'bg-[#30497D]' : 'bg-[#E4E9F3]'
+                  }`}
+                />
+                <span
+                  className={`font-poppins text-[13px] font-normal leading-[20px] ${
+                    darkMode ? 'text-[#E4E9F3]' : 'text-[#16213E]'
+                  }`}
+                >
+                  In progress
+                </span>
               </div>
-              <span className="font-bold text-neutral-900">10</span>
+              <span
+                className={`font-poppins text-[13px] font-semibold leading-[20px] ${
+                  darkMode ? 'text-[#FFFFFF]' : 'text-[#16213E]'
+                }`}
+              >
+                10
+              </span>
             </div>
           </div>
         </div>
 
-        {/* Recent Tracked Tasks Card */}
-        <div className="lg:col-span-8 rounded-[20px] border border-neutral-700 bg-white p-6 min-h-[380px] shadow-[0_5px_15px_rgba(0,0,0,0.06)]">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="text-sm font-bold text-neutral-900">
+        {/* Recent-Activity-Card */}
+        <div
+          className={`flex min-h-[388px] flex-1 w-full flex-col items-start gap-[16px] rounded-[16px] border p-[24px] transition-colors ${
+            darkMode
+              ? 'border-[#30497D] bg-[#16213E]'
+              : 'border-[#A9B7D6] bg-[#FFFFFF]'
+          }`}
+        >
+          <div className="flex h-[24px] w-full flex-row items-center justify-between">
+            <h2
+              className={`font-poppins text-[16px] font-bold leading-[24px] ${
+                darkMode ? 'text-[#F6F4EF]' : 'text-[#16213E]'
+              }`}
+            >
               Recent Tracked Tasks
-            </h3>
+            </h2>
             <button
               type="button"
-              className="text-xs font-semibold text-neutral-500 hover:text-neutral-900 underline underline-offset-4 cursor-pointer"
+              onClick={() => navigate('/dashboard/profile')}
+              className={`font-poppins text-[12px] font-semibold leading-[18px] underline transition-colors cursor-pointer ${
+                darkMode
+                  ? 'text-[#A9B7D6] hover:text-[#FFFFFF]'
+                  : 'text-[#455B8A] hover:text-[#253C6D]'
+              }`}
             >
               View all
             </button>
           </div>
 
-          {/* Table Rows */}
-          <div className="divide-y divide-neutral-100">
-            {TASKS.map((task) => (
+          <div className="flex w-full flex-col items-start">
+            {filteredTasks.map((task) => (
               <div
                 key={task.id}
-                className="flex items-center justify-between py-4 transition-colors hover:bg-neutral-50/70 rounded-xl px-2"
+                className={`flex min-h-[75px] w-full flex-col sm:flex-row sm:items-center justify-between gap-[12px] sm:gap-[16px] border-b px-[12px] py-[16px] transition-colors ${
+                  darkMode
+                    ? 'border-[#30497D] hover:bg-[#1A2B52]/70'
+                    : 'border-[#A9B7D6] hover:bg-[#F6F4EF]/50'
+                }`}
               >
-                <div>
-                  <h4 className="text-xs font-bold text-neutral-900">
+                <div className="flex flex-1 flex-col items-start gap-[4px] min-w-0">
+                  <h3
+                    className={`w-full truncate font-poppins text-[14px] font-semibold leading-[21px] ${
+                      darkMode ? 'text-[#F6F4EF]' : 'text-[#16213E]'
+                    }`}
+                  >
                     {task.title}
-                  </h4>
-                  <p className="mt-0.5 text-[11px] font-normal text-neutral-400">
+                  </h3>
+                  <p
+                    className={`w-full truncate font-poppins text-[12px] font-normal leading-[18px] ${
+                      darkMode ? 'text-[#A9B7D6]' : 'text-[#455B8A]'
+                    }`}
+                  >
                     {task.desc}
                   </p>
                 </div>
 
-                <div className="flex items-center gap-4 sm:gap-8">
+                <div className="flex items-center justify-between sm:justify-end gap-[16px] shrink-0">
+                  <div className="flex w-auto sm:w-[120px] items-start">
+                    <span
+                      className={`inline-flex h-[25px] items-center justify-center rounded-[4px] px-[8px] py-[4px] font-poppins text-[11px] font-semibold leading-[16px] !text-[#16213E] ${task.statusBg}`}
+                    >
+                      {task.status}
+                    </span>
+                  </div>
+
                   <span
-                    className={`rounded-md px-2.5 py-1 text-[11px] font-semibold ${task.statusColor}`}
+                    className={`w-auto sm:w-[100px] text-right font-poppins text-[13px] font-normal leading-[20px] ${
+                      darkMode ? 'text-[#A9B7D6]' : 'text-[#455B8A]'
+                    }`}
                   >
-                    {task.status}
-                  </span>
-                  <span className="w-24 text-right text-[11px] font-normal text-neutral-400">
                     {task.time}
                   </span>
                 </div>
